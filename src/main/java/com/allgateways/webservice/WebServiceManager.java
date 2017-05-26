@@ -18,10 +18,12 @@ import cz.msebera.android.httpclient.Header;
 public class WebServiceManager {
 
     private static String BASE_URL = "";
+    private static boolean debug = false;
 
 
-    public static void init(String baseUrl){
+    public static void init(String baseUrl,boolean isDebug){
         BASE_URL = baseUrl;
+        debug = isDebug;
     }
 
     private static WebServiceManager instance;
@@ -49,7 +51,9 @@ public class WebServiceManager {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 if (statusCode == 200) {
                     String responseString = new String(responseBody);
-                    Log.v("WebService", responseString);
+                    if (debug){
+                        Log.v("WebService", responseString);
+                    }
                     BaseResponse responseObject = JsonUtils.jsonToObject(responseString,BaseResponse.class,responseCls);//jsonToObject(responseString,BaseResponse.class,responseCls);
                     ls.onHttpResponse(responseObject,responseObject != null && responseObject.getResCode().equals("0"));
                 }else{
@@ -69,14 +73,18 @@ public class WebServiceManager {
     public <T> void asyncRequest(final BaseRequest request,final Class<T> responseCls,final HttpClientListener ls){
         Map<String, String> map = request.toMap();
         RequestParams params = new RequestParams(map);
-        System.out.println("request:"+JsonUtils.objectToString(request));
+        if (debug){
+            Log.v("WebService","request:"+JsonUtils.objectToString(request));
+        }
         if (request.getRequestType().equals(BaseRequest.GET)){
             client.get(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                     if (statusCode == 200){
                         String responseString = new String(responseBody);
-                        Log.v("WebService",responseString);
+                        if (debug){
+                            Log.v("WebService",responseString);
+                        }
                         BaseResponse responseObject = JsonUtils.jsonToObject(responseString,BaseResponse.class,responseCls);//jsonToObject(responseString,BaseResponse.class,responseCls);
                         ls.onHttpResponse(responseObject,responseObject != null && responseObject.getResCode().equals("0"));
 
@@ -96,7 +104,9 @@ public class WebServiceManager {
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                     if (statusCode == 200){
                         String responseString = new String(responseBody);
-                        Log.v("WebService",responseString);
+                        if (debug){
+                            Log.v("WebService",responseString);
+                        }
 
                         BaseResponse responseObject = JsonUtils.jsonToObject(responseString,BaseResponse.class,responseCls); //jsonToObject(responseString,BaseResponse.class,responseCls);
                         ls.onHttpResponse(responseObject,responseObject != null && responseObject.getResCode().equals("0"));
@@ -110,7 +120,9 @@ public class WebServiceManager {
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                     if (responseBody != null){
                         String responseString = new String(responseBody);
-                        Log.e("WebService",responseString);
+                        if (debug){
+                            Log.e("WebService",responseString);
+                        }
                     }
                     ls.onHttpResponse(null,false);
                 }
