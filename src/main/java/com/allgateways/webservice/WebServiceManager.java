@@ -1,5 +1,6 @@
 package com.allgateways.webservice;
 
+import android.os.Looper;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -46,7 +47,7 @@ public class WebServiceManager {
         Map<String, String> map = request.toMap();
         RequestParams params = new RequestParams(map);
         params.put(fileKey,inputStream, UUID.randomUUID().toString()+".jpg", "image/jpeg");
-        client.post(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler() {
+        client.post(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler(Looper.getMainLooper()) {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 if (statusCode == 200) {
@@ -77,7 +78,7 @@ public class WebServiceManager {
             Log.v("WebService","request:"+JsonUtils.objectToString(request));
         }
         if (request.getRequestType().equals(BaseRequest.GET)){
-            client.get(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler() {
+            client.get(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler(Looper.getMainLooper()) {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                     if (statusCode == 200){
@@ -99,7 +100,7 @@ public class WebServiceManager {
                 }
             });
         }else if (request.getRequestType().equals(BaseRequest.POST)){
-            client.post(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler() {
+            client.post(getAbsoluteUrl(request.getMethod()), params, new AsyncHttpResponseHandler(Looper.getMainLooper()) {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                     if (statusCode == 200){
